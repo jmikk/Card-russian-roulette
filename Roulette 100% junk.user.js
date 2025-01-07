@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         9003 Roulette 100%
+// @name         9003 Roulette 1/6
 // @version      1.2
 // @description  Junks one random card every time you open a pack of cards
 // @author       9003
@@ -24,6 +24,7 @@
         if (junkButtons.length > 0) {
             const randomButton = junkButtons[Math.floor(Math.random() * junkButtons.length)];
             playSound(laserZapSound); // Play zap sound
+            randomButton.dataset.rarity = "uncommon";
             randomButton.click(); // Junk the card
         } else {
             console.warn('No junk buttons found!');
@@ -36,7 +37,6 @@
         document.querySelectorAll(".deckcard").forEach((card) => {
             const junkButton = card.querySelector(".deckcard-junk-button");
             if (junkButton) {
-                junkButton.dataset.rarity = "uncommon";
                 junkButtons.push(junkButton); // Collect all junk buttons
             }
         });
@@ -48,15 +48,17 @@
             console.warn('No junk buttons found on the page.');
         }
     }
-
     // Wait until the DOM is fully loaded
     window.addEventListener('load', () => {
-        // Check if the "back" element is present
-        if (document.querySelector('figure.back')) {
-            console.log('Back element found. Running junker.');
+        // Check if the "Tap cards to reveal..." text is present
+        const revealText = Array.from(document.querySelectorAll('p, span, div'))
+            .some(element => element.textContent.trim() === "Tap cards to reveal...");
+
+        if (revealText) {
+            console.log('"Tap cards to reveal..." text found. Running junker.');
             processJunkButtons(); // Run the junking process
         } else {
-            console.warn('Back element not found. Aborting.');
+            console.log('"Tap cards to reveal..." text not found. Script will not run on this page.');
         }
     });
 })();
